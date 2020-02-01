@@ -25,9 +25,10 @@ const sampleTasks = [
 const taskActions = {
   DATA: 0,
   ADD: 1,
-  SET_STATUS: 2,
-  SET_DELETED: 3,
-  RESET: 4,
+  UPDATE: 2,
+  SET_STATUS: 3,
+  SET_DELETED: 4,
+  RESET: 5,
 };
 
 // payload is an array of tasks ordered based on due date (soonest first)
@@ -48,12 +49,43 @@ function taskDataReducer(state, payload) {
 
 function taskAddReducer(state, payload) {
   // need to find out where to place the task within existing tasks based on due date
-  const order = state.order.reduce((order, id) => {
+  const [order] = state.order.reduce(([order, isInserted], id, i, currentOrder) => {
     // insert new task id in order when a task with a later due date is found
-    state.tasks[id].dueAt > payload.dueAt && order.push(payload.id);
+    state.tasks[id].dueAt > payload.dueAt && (isInserted = true) && order.push(payload.id);
     order.push(id);
-    return order;
-  }, []);
+
+    // if reach the end and the task hasn't been inserted yet, insert it at the end
+    (i === currentOrder.length) && !isInserted && (isInserted = true) && order.push(payload.id);
+
+    return [order, isInserted];
+  }, [[], false]);
+
+  const tasks = { ...state.tasks, [payload.id]: payload };
+
+  return {
+    ...state,
+    tasks,
+    order,
+  };
+}
+
+function taskUpdateReducer(state, payload) {
+  // need to find out where to place the task within existing tasks if date has changed
+  const [order] = (state.tasks[payload.id].dueAt.getTime() !== payload.dueAt.getTime())
+    ? state.order.reduce(([order, isInserted], id, i, currentOrder) => {
+        // skip updated task (will be reinserted per below logic)
+        if (id === payload.id) return [order, isInserted];
+        
+        // insert task id in order when a task with a later due date is found
+        state.tasks[id].dueAt > payload.dueAt && (isInserted = true) && order.push(payload.id);
+        order.push(id);
+        
+        // if reach the end and the task hasn't been inserted yet, insert it at the end
+        (i === currentOrder.length - 1) && !isInserted && (isInserted = true) && order.push(payload.id);
+
+        return [order, isInserted];
+      }, [[], false])
+    : [state.order];
 
   const tasks = { ...state.tasks, [payload.id]: payload };
 
@@ -65,7 +97,6 @@ function taskAddReducer(state, payload) {
 }
 
 function taskSetStatusReducer(state, payload) {
-
   const task = { ...state.tasks[payload.id], status: payload.status };
   const tasks = { ...state.tasks, [task.id]: task };
 
@@ -76,7 +107,6 @@ function taskSetStatusReducer(state, payload) {
 }
 
 function taskSetDeletedReducer(state, payload) {
-
   const order = state.order.reduce((order, id) => {
     // push task into new order array if id not that of task being deleted
     id !== payload.id && order.push(id);
@@ -84,7 +114,7 @@ function taskSetDeletedReducer(state, payload) {
   }, []);
 
   // extract other tasks from state
-  const { [payload.id]: _, tasks } = state.tasks;
+  const { [payload.id]: _, ...tasks } = state.tasks;
 
   return {
     ...state,
@@ -105,6 +135,9 @@ function taskReducer(state, { type, payload }) {
 
     case taskActions.ADD:
       return taskAddReducer(state, payload);
+
+    case taskActions.UPDATE:
+      return taskUpdateReducer(state, payload);
 
     case taskActions.SET_STATUS:
       return taskSetStatusReducer(state, payload);
@@ -143,7 +176,7 @@ export default function TaskList() {
     <div>
       {taskState.order.map((id) => {
         const task = taskState.tasks[id];
-        return <TaskCard {...{ key: task.id, task, taskDispatch }} />;
+        return <TaskCard {...{ key: task.id, task, taskDispatch, taskActions }} />;
       })}
     </div>
   );

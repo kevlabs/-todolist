@@ -9,15 +9,21 @@ export default function ActionMenu({ classNamePrefix, children }) {
 
   // stop propagation of clicks (used on menu so that window click when the current target is the menu do not close the menu)
   const preventWindowClick = useCallback((e) => {
+    console.log('PREVENT WINDOW');
+    
     e.preventDefault();
     e.stopPropagation();
   }, []);
 
   // open/close menu
   const toggleIsOpen = useCallback((e) => {
-    preventWindowClick(e);
-    setIsOpen(prev => !prev);
-  }, [preventWindowClick]);
+    e.preventDefault();
+
+    // make sure click event is only handled once
+    isOpen && e.stopPropagation();
+
+    setIsOpen((prev) => !prev);
+  }, [isOpen]);
 
   // set up effect so that menu closes when user clicks anywhere on window
   useEffect(() => {
