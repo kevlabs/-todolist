@@ -1,0 +1,117 @@
+@import '../variables';
+
+.task-card {
+  border-radius: 0.8rem;
+  background-color: $bg-color-primary;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: $color-content-primary;
+  padding: 0.5rem 0.8rem;
+  margin: 0.5rem 0;
+
+  &__header {
+    position: relative;
+    padding: 0.5rem;
+
+    & h2 {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: $color-heading-primary;
+      padding: 0;
+      margin: 0 1.5rem 0.5rem 0
+    }
+    
+    & p {
+      font-style: italic;
+      color: $color-subheading-primary;
+      padding: 0;
+      margin: 0.5rem 1.5rem 0.5rem 0;
+    }
+
+    &-action {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: $color-action-primary;
+      padding: 0;
+      margin: 0 0 0.5rem 0.5rem;
+
+      &:hover {
+        font-weight: 600;
+        color: $color-action-selected-primary;
+      }
+
+      &--selected {
+        background-color: $bg-color-secondary;
+        box-shadow: 0.15rem 0.15rem $color-action-selected-primary;
+        border-radius: 0.5rem 0.5rem 0 0;
+      }
+    }
+
+    &-action-menu {
+      z-index: 10;
+      position: absolute;
+      top: 1.5rem;
+      right: 0;
+      list-style-type: none;
+      width: 30%;
+      min-width: 200px;
+      background-color: $bg-color-secondary;
+      // border: 1px solid $color-action-selected-primary;
+      box-shadow: 0.15rem 0.15rem $color-action-selected-primary;
+      border-radius: 0.5rem 0 0.5rem 0.5rem;
+      padding: 0.4rem 0;
+      margin: 0;
+      overflow: hidden;
+
+      & li {
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0.4rem 0.6rem;
+        margin: 0;
+
+        // &:nth-child(n+2) {
+        //   border-top: 1px dashed $color-action-primary;
+        // }
+
+        &.clickable {
+          cursor: pointer;
+        }
+
+        &.clickable:hover {
+          background-color: $color-action-selected-primary;
+          color: $bg-color-secondary;
+        }
+      }
+
+      & hr {
+        border: 1px dashed $color-action-primary;
+        margin: 0.4rem 0;
+      }
+    }
+  }
+
+  &__body {
+    border-radius: 0.8rem;
+    background-color: $bg-color-secondary;
+    padding:  0.8rem 0.5rem;
+
+    & p {
+      padding: 0;
+      margin: 0;
+    }
+
+  }
+
+
+}
