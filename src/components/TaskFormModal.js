@@ -2,11 +2,20 @@ import React, { useCallback, useState } from 'react';
 import Modal from './Modal';
 import moment from 'moment';
 
+// returns form input handler
+function handleChange(setState) {
+  return (e) => {
+    e.preventDefault();
+    setState(e.currentTarget.value);
+  }
+}
+
 export default function TaskFormModal({ isOpen, setIsOpen, task, taskDispatch, taskActions }) {
 
   const isEdit = task !== undefined;
 
   const [error, setError] = useState('');
+  const [isFormLocked, setIsFormLocked] = useState(false);
   const [name, setName] = useState(isEdit ? task.name : '');
   const [description, setDescription] = useState(isEdit ? task.description : '');
   const [dueAt, setDueAt] = useState(isEdit ? moment(task.dueAt).format(moment.HTML5_FMT.DATETIME_LOCAL) : moment.HTML5_FMT.DATETIME_LOCAL);
@@ -23,14 +32,6 @@ export default function TaskFormModal({ isOpen, setIsOpen, task, taskDispatch, t
     taskDispatch({ type: taskActions.UPDATE, payload: task });
   }, [taskDispatch, taskActions]);
 
-  // should be made a helper fn
-  const handleChange = useCallback((setState) => {
-    return (e) => {
-      e.preventDefault();
-      setState(e.currentTarget.value);
-    }
-  }, []);
-
   // reset form to db task values
   const handleReset = (e) => {
     e.preventDefault();
@@ -44,12 +45,22 @@ export default function TaskFormModal({ isOpen, setIsOpen, task, taskDispatch, t
   // no need to memoize as is dependent on form data
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsFormLocked(true);
     clearError();
 
     const parsedDueAt = moment(dueAt, moment.HTML5_FMT.DATETIME_LOCAL).toDate();
 
-    if (!name) return setError('Name cannot be blank!');
-    if (parsedDueAt < Date.now()) return setError('The task due date must be in the future!');
+    try {
+      // validate form
+      if (!name) throw Error('Name cannot be blank!');
+      if (parsedDueAt < Date.now()) throw Error('The task due date must be in the future!');
+
+    } catch (err) {
+      // print error message and release form
+      setError(err.message);
+      setIsFormLocked(false);
+      return;
+    }
 
     const submittedTask = { ...task, name, description, dueAt: parsedDueAt };
 
@@ -62,7 +73,8 @@ export default function TaskFormModal({ isOpen, setIsOpen, task, taskDispatch, t
         isEdit ? updateTask(task) : addTask(task);
         setIsOpen(false);
       })
-      .catch((err) => console.log(`Error while ${isEdit ? 'updating' : 'creating'} task`));
+      .catch((err) => setError(`Error while ${isEdit ? 'updating' : 'creating'} task`))
+      .finally(() => setIsFormLocked(false));
 
   };
   
@@ -76,8 +88,8 @@ export default function TaskFormModal({ isOpen, setIsOpen, task, taskDispatch, t
         <textarea name="description" id="task-description" value={description} placeholder="Enter a brief description..." rows={5} onChange={handleChange(setDescription)} />
         <label htmlFor="task-dueat">Finish by</label>
         <input name="dueat" id="task-dueat" type="datetime-local" value={dueAt} onChange={handleChange(setDueAt)} required />
-        <button type="submit">Submit</button>
-        <button type="reset">Reset</button>
+        <button type="submit" disabled={isFormLocked}>Submit</button>
+        <button type="reset" disabled={isFormLocked}>Reset</button>
       </form>
     </Modal>
   );
