@@ -20,10 +20,14 @@ export default function EditModal({ isOpen, setIsOpen, task, taskDispatch, taskA
     }
   }, []);
 
+  const handleReset = (e) => {
+    setName(task.name);
+    setDescription(task.description);
+    setDueAt(moment(task.dueAt).format(moment.HTML5_FMT.DATETIME_LOCAL));
+  };
+
   // no need to memoize as is dependent on form data
   const handleSubmit = (e) => {
-    console.log('calling submit');
-    
     e.preventDefault();
     const editedTask = { ...task, name, description, dueAt: moment(dueAt, moment.HTML5_FMT.DATETIME_LOCAL).toDate() };
 
@@ -42,18 +46,15 @@ export default function EditModal({ isOpen, setIsOpen, task, taskDispatch, taskA
   
   return (
     <Modal {...{ isOpen, setIsOpen, title: `Edit Task: ${name}` }}>
-      {/* <form onSubmit={handleSubmit}> */}
-      <form>
-        <label>Name
-          <input name="name" type="text" value={name} onChange={handleChange(setName)} required />
-        </label>
-        <label>Description
-          <textarea name="description" value={description} onChange={handleChange(setDescription)} />
-        </label>
-        <label>Finish by
-          <input name="dueat" type="datetime-local" value={dueAt} onChange={handleChange(setDueAt)} required />
-        </label>
-        <button type="submit" onClick={handleSubmit}>Submit</button>
+      <form onSubmit={handleSubmit} onReset={handleReset}>
+        <label for="edit-name">Name</label>
+        <input name="name" id="edit-name" type="text" value={name} placeholder="Enter the task name..." onChange={handleChange(setName)} required />
+        <label>Description</label>
+        <textarea name="description" value={description} placeholder="Enter a brief description..." rows={5} onChange={handleChange(setDescription)} />
+        <label>Finish by</label>
+        <input name="dueat" type="datetime-local" value={dueAt} onChange={handleChange(setDueAt)} required />
+        <button type="submit">Submit</button>
+        <button type="reset">Reset</button>
       </form>
     </Modal>
   );

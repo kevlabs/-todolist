@@ -7,6 +7,8 @@
   left: 15vw;
   width: 70vw;
   height: 80vh;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0.15rem 0.15rem $color-action-selected-primary;
   border-radius: 0.8rem;
   background-color: $bg-color-secondary;
@@ -14,6 +16,7 @@
   font-size: 0.8rem;
   font-weight: 300;
   color: $color-content-primary;
+  overflow: hidden;
   padding: 0;
   margin: 0;
 
@@ -27,16 +30,18 @@
 
   &__header {
     position: relative;
-    background-color: $bg-color-primary;
+    flex-shrink: 0;
+    flex-grow: 0;
+    background-color: $bg-color-dark-primary;
     padding: 0.8rem 1rem;
 
     & h3 {
-      font-family: 'Times New Roman', Times, serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 1.4rem;
       font-weight: 700;
       color: $color-heading-primary;
       padding: 0;
-      margin: 0 2rem 0.5rem 0
+      margin: 0 2rem 0.5rem 0;
     }
 
     &-action {
@@ -65,12 +70,87 @@
   }
 
   &__body {
-    padding:  0.8rem 1rem;
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 1.5rem 1rem;
+    margin: 0;
+
+    &::-webkit-scrollbar {
+      width: 2rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      height: 3rem;
+      border: 0.6rem solid transparent;
+      background-clip: padding-box;
+      border-radius: 1rem;
+      background-color: $color-action-selected-primary;
+    }
 
     & p {
       padding: 0;
       margin: 0;
     }
+
+    & form {
+      display: flex;
+      flex-wrap: wrap;
+
+      & * {
+        flex-grow: 1;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        margin: 0.5rem 0;
+      }
+    }
+
+    & label {
+      display: inline-block;
+      flex-basis: 15%;
+      min-width: 100px;
+    }
+
+    & input, textarea {
+      display: inline-block;
+      flex-basis: 75%;
+      border: 1px solid $bg-color-primary;
+      border-radius: 0.5rem;
+      color: $bg-color-primary;
+      background-color: $color-action-primary;
+      resize: none;
+      outline: none;
+      padding: 0.3rem 0.5rem;
+
+    }
+
+    & button {
+      display: block;
+      flex-basis: 30%;
+      border-radius: 0.5rem;
+      border: none;
+      background-color: $bg-color-primary;
+      color: $color-content-secondary;
+      font-weight: 500;
+      transition: opacity 0.3s ease-in;
+      outline: none;
+      padding: 0.3rem 0.5rem;
+
+      &:not(:first-of-type) {
+        margin-left: 1rem;
+      }
+
+      &:hover {
+        opacity: 0.95;
+      }
+
+    }
+
+   
 
   }
 

@@ -5,7 +5,6 @@ export default function Modal({ isOpen, setIsOpen, title, children }) {
 
   // stop propagation of clicks (used on menu so that window click when the current target is the menu do not close the menu)
   const preventWindowClick = useCallback((e) => {
-    e.preventDefault();
     e.stopPropagation();
   }, []);
 
