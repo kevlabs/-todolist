@@ -1,5 +1,6 @@
 import React, { useEffect, useReducer } from 'react';
 import TaskCard from './TaskCard';
+import AddButton from './AddButton';
 
 // SAMPLE DATA
 const sampleTasks = [
@@ -48,6 +49,12 @@ function taskDataReducer(state, payload) {
 }
 
 function taskAddReducer(state, payload) {
+  // FOR TESTING PURPOSES ADD MISSING INFO FOR NEW TASKS
+  if (!('id' in payload)) {
+    payload.id = state.order.length + 1;
+    payload.status = 'Not Started';
+  }
+
   // need to find out where to place the task within existing tasks based on due date
   const [order] = state.order.reduce(([order, isInserted], id, i, currentOrder) => {
     // insert new task id in order when a task with a later due date is found
@@ -55,7 +62,7 @@ function taskAddReducer(state, payload) {
     order.push(id);
 
     // if reach the end and the task hasn't been inserted yet, insert it at the end
-    (i === currentOrder.length) && !isInserted && (isInserted = true) && order.push(payload.id);
+    (i === currentOrder.length - 1) && !isInserted && (isInserted = true) && order.push(payload.id);
 
     return [order, isInserted];
   }, [[], false]);
@@ -73,12 +80,12 @@ function taskUpdateReducer(state, payload) {
   // need to find out where to place the task within existing tasks if date has changed
   const [order] = (state.tasks[payload.id].dueAt.getTime() !== payload.dueAt.getTime())
     ? state.order.reduce(([order, isInserted], id, i, currentOrder) => {
-        // skip updated task (will be reinserted per below logic)
-        if (id === payload.id) return [order, isInserted];
         
         // insert task id in order when a task with a later due date is found
         state.tasks[id].dueAt > payload.dueAt && (isInserted = true) && order.push(payload.id);
-        order.push(id);
+
+        // skip updated task
+        id !== payload.id && order.push(id);
         
         // if reach the end and the task hasn't been inserted yet, insert it at the end
         (i === currentOrder.length - 1) && !isInserted && (isInserted = true) && order.push(payload.id);
@@ -173,12 +180,15 @@ export default function TaskList() {
   
 
   return (
-    <div>
-      {taskState.order.map((id) => {
-        const task = taskState.tasks[id];
-        return <TaskCard {...{ key: task.id, task, taskDispatch, taskActions }} />;
-      })}
-    </div>
+    <>
+      <AddButton {...{ taskDispatch, taskActions }} />
+      <div>
+        {taskState.order.map((id) => {
+          const task = taskState.tasks[id];
+          return <TaskCard {...{ key: task.id, task, taskDispatch, taskActions }} />;
+        })}
+      </div>
+    </>
   );
 
 }

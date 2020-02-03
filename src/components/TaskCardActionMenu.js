@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import ActionMenu from './ActionMenu';
 import ActionMenuItem from './ActionMenuItem';
-import EditModal from './EditModal';
+import EditModal from './TaskFormModal';
 
 export default function TaskCardActionMenu({ task, taskDispatch, taskActions }) {
 

@@ -93,9 +93,10 @@
       background-color: $color-action-selected-primary;
     }
 
-    & p {
+    .modal & p {
+      color: $color-content-primary;
       padding: 0;
-      margin: 0;
+      margin: 0.6rem 0;
     }
 
     & form {
