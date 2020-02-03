@@ -67,7 +67,7 @@ export default function TaskFormModal({ isOpen, setIsOpen, task, taskDispatch, t
   };
   
   return (
-    <Modal {...{ isOpen, setIsOpen, title: `${isEdit ? 'Edit' : 'New'} Task: ${name}` }}>
+    <Modal {...{ isOpen, setIsOpen, title: `${isEdit ? 'Edit' : 'New'} Task${name ? `: ${name}` : ''}` }}>
       {error && <p>{error}</p>}
       <form onSubmit={handleSubmit} onReset={handleReset}>
         <label htmlFor="task-name">Name</label>
