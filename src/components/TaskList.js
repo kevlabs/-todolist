@@ -52,13 +52,13 @@ function taskAddReducer(state, payload) {
   // FOR TESTING PURPOSES ADD MISSING INFO FOR NEW TASKS
   if (!('id' in payload)) {
     payload.id = state.order.length + 1;
-    payload.status = 'Not Started';
+    payload.status = 'Not started';
   }
 
   // need to find out where to place the task within existing tasks based on due date
   const [order] = state.order.reduce(([order, isInserted], id, i, currentOrder) => {
     // insert new task id in order when a task with a later due date is found
-    state.tasks[id].dueAt > payload.dueAt && (isInserted = true) && order.push(payload.id);
+    !isInserted && state.tasks[id].dueAt > payload.dueAt && (isInserted = true) && order.push(payload.id);
     order.push(id);
 
     // if reach the end and the task hasn't been inserted yet, insert it at the end
@@ -82,7 +82,7 @@ function taskUpdateReducer(state, payload) {
     ? state.order.reduce(([order, isInserted], id, i, currentOrder) => {
         
         // insert task id in order when a task with a later due date is found
-        state.tasks[id].dueAt > payload.dueAt && (isInserted = true) && order.push(payload.id);
+        !isInserted && state.tasks[id].dueAt > payload.dueAt && (isInserted = true) && order.push(payload.id);
 
         // skip updated task
         id !== payload.id && order.push(id);
